@@ -6,6 +6,10 @@ pipeline {
     //     DOCKER_TAG = "${env.BUILD_ID}"
     //     DOCKER_REGISTRY_CREDENTIALS = 'dockerhub-credentials'
     // }
+
+    tools {
+        maven 'maven'  // This must match the name in Jenkins Tools
+    }
     
     stages {
         stage('Checkout Code') {
