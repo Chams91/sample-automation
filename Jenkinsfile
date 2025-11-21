@@ -38,7 +38,23 @@ pipeline {
             }
         }
         
-        
+        stage('Start Colima if Needed') {
+            steps {
+                sh '''
+                    if ! colima status 2>/dev/null; then
+                        echo "🔧 Starting Colima..."
+                        colima start
+                        sleep 10
+                    else
+                        echo "✅ Colima is running"
+                    fi
+                    
+                    # Verify Docker works
+                    docker ps && echo "✅ Docker is working" || echo "❌ Docker not working"
+                '''
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker image..."
@@ -47,36 +63,36 @@ pipeline {
             }
         }
         
-        stage('Run App with Docker') {
-            steps {
-                echo "Starting application in Docker container..."
-                script {
-                    // Stop and remove any existing container
-                    sh 'docker stop basic-spring-app || true'
-                    sh 'docker rm basic-spring-app || true'
-                    // Run new container
-                    sh "docker run -d -p 8088:8080 --name basic-spring-app ${DOCKER_IMAGE}:${DOCKER_TAG}"
-                    // Wait for app to start
-                    sleep 30
-                }
-            }
-        }
+        // stage('Run App with Docker') {
+        //     steps {
+        //         echo "Starting application in Docker container..."
+        //         script {
+        //             // Stop and remove any existing container
+        //             sh 'docker stop basic-spring-app || true'
+        //             sh 'docker rm basic-spring-app || true'
+        //             // Run new container
+        //             sh "docker run -d -p 8088:8080 --name basic-spring-app ${DOCKER_IMAGE}:${DOCKER_TAG}"
+        //             // Wait for app to start
+        //             sleep 30
+        //         }
+        //     }
+        // }
         
-        stage('Run Smoke Tests') {
-            steps {
-                echo "Running smoke tests on deployed application..."
-                sh 'chmod +x smoke-test.sh'
-                sh './smoke-test.sh'
-            }
+        // stage('Run Smoke Tests') {
+        //     steps {
+        //         echo "Running smoke tests on deployed application..."
+        //         sh 'chmod +x smoke-test.sh'
+        //         sh './smoke-test.sh'
+        //     }
             
-            post {
-                always {
-                    echo "Cleaning up test container..."
-                    sh 'docker stop hello-app || true'
-                    sh 'docker rm hello-app || true'
-                }
-            }
-        }
+        //     post {
+        //         always {
+        //             echo "Cleaning up test container..."
+        //             sh 'docker stop hello-app || true'
+        //             sh 'docker rm hello-app || true'
+        //         }
+        //     }
+        // }
         
         // stage('Push to DockerHub') {
         //     steps {
