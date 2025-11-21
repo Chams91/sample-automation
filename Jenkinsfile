@@ -25,6 +25,19 @@ pipeline {
                 sh 'mvn clean compile'
             }
         }
+
+        stage('Verify Environment') {
+            steps {
+                sh '''
+                    echo "Home: $HOME"
+                    echo "User: $(whoami)"
+                    echo "Docker Host: $DOCKER_HOST"
+                    colima status || echo "Colima not running"
+                    docker version || echo "Docker not accessible"
+                '''
+            }
+        }
+        
         
         stage('Build Docker Image') {
             steps {
