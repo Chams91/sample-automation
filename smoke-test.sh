@@ -4,7 +4,7 @@ echo "Starting smoke tests..."
 
 # Test if application is responding
 echo "1. Testing if application is up..."
-response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/home)
+response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8088/home)
 
 if [ "$response" -eq 200 ]; then
     echo "✓ Application is responding (HTTP $response)"
